@@ -1,0 +1,26 @@
+{
+  "name": "event-ticketing-system-verification-backend",
+  "version": "1.0.0",
+  "description": "event-ticketing-system-verification-service",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bratinghosh/event-ticketing-system-verification-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bratinghosh/event-ticketing-system-verification-backend/issues"
+  },
+  "homepage": "https://github.com/bratinghosh/event-ticketing-system-verification-backend#readme",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "mongoose": "^7.2.4",
+    "nodemon": "^2.0.22"
+  }
+}
