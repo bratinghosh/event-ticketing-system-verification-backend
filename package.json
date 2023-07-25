@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/bratinghosh/event-ticketing-system-verification-backend#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",

@@ -6,7 +6,7 @@ const router = express.Router();
 // master path: /api/v1/accounts
 
 // get the id (to be displayed as QR-Code) using the wallet_address and password_hash
-router.get("/id", (req, res) => {
+router.post("/id", (req, res) => {
     // return the id of an account
     // body: { wallet_address, password_hash }
     const wallet_address = req.body.wallet_address;
@@ -14,17 +14,17 @@ router.get("/id", (req, res) => {
 
     Account.exists({ wallet_address: wallet_address, hash: computeHashForDatabaseStorage(wallet_address, password_hash) })
     .then((output) => {
-        if (output) {
-            res.status(200).json({ id: output._id });
-        } else {
+        if (!output) {
             res.status(404).json({ message: "account not found." });
+        } else {
+            res.status(200).json({ id: output._id });
         }
     }).catch((err) => res.status(500).json({ message: err }));
 });
 
-// create a new account for a new wallet_address login to the organizer UI
-router.post("/create", (req, res) => {
-    // create a new account if does not exist
+// create a new account if not present for a wallet_address login to the organizer UI
+router.post("/login", (req, res) => {
+    // create a new account if does not exist else verify wallet_address and password
     // body: { wallet_address, password_hash }
     const wallet_address = req.body.wallet_address;
     const password_hash = req.body.password_hash;
@@ -35,14 +35,21 @@ router.post("/create", (req, res) => {
         tickets: []
     });
 
-    Account.exists({ wallet_address: wallet_address })
+    Account.exists({ wallet_address: wallet_address, hash: computeHashForDatabaseStorage(wallet_address, password_hash)})
     .then((output) => {
         if (!output) {
-            doc.save()
-            .then(() => res.status(200).json(doc))
-            .catch((err) => res.status(500).json({ message: "failed to create account." }));
+            Account.exists({ wallet_address: wallet_address })
+            .then((output) => {
+                if (!output) {
+                    doc.save()
+                    .then(() => res.status(200).json(doc))
+                    .catch((err) => res.status(500).json({ message: "failed to create account." }));
+                } else {
+                    res.status(401).json({ message: "wrong password." });
+                }
+            }).catch((err) => res.status(500).json({ message: err }));
         } else {
-            res.status(401).json({ message: "account already exists." });
+            res.status(200).json(doc);
         }
     }).catch((err) => res.status(500).json({ message: err }));
 });
