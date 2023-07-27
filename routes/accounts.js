@@ -69,18 +69,18 @@ router.get("/tickets/:id", (req, res) => {
     }).catch((err) => res.status(500).json({ message: err }));
 });
 
-// Update the database with the latest wallet_address-tickets mapping information
-router.post("/tickets/:id", (req, res) => {
-    // update all the tickets (list of ticket ids) of an account
-    // params : { id }
-    // body: { tickets }
-    const id = req.params.id;
-    const tickets = req.body.tickets; // list of ticket ids
+// Update the database with the all latest wallet_address-tickets mapping information
+router.post("/tickets/updatemapping", (req, res) => {
+    // update the tickets owned by all the accounts
+    // body: { wallet_address: tickets, wallet_address: tickets, ... }
+    const map = req.body;
 
-    Account.findByIdAndUpdate(id, { tickets: tickets })
-    .then((output) => {
-        res.status(200).json({ message: "tickets of wallet_address "+ output.wallet_address +" updated." });
-    }).catch((err) => res.status(500).json({ message: err }));
+    Object.keys(map).forEach(wallet_address => {  
+        Account.findOneAndUpdate({ wallet_address: wallet_address }, { tickets: map[wallet_address] })
+            .catch((err) => res.status(500).json({ message: err }));
+    })
+
+    return res.status(200).json({ message: "wallet_address-tickets mapping information updated." });
 });
 
 // Use a ticket by scanning the id off the QR-Code and calling this endpoint
