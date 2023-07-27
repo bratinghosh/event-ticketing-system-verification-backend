@@ -76,7 +76,7 @@ router.post("/tickets/updatemapping", (req, res) => {
     const map = req.body;
 
     Object.keys(map).forEach(wallet_address => {  
-        Account.findOneAndUpdate({ wallet_address: wallet_address }, { tickets: map[wallet_address] })
+        Account.findOneAndUpdate({ wallet_address: wallet_address.toLowerCase() }, { tickets: map[wallet_address] })
             .catch((err) => res.status(500).json({ message: err }));
     })
 
@@ -93,16 +93,20 @@ router.delete("/tickets/:id", (req, res) => {
     .then((output) => {
         if (output) {
             var tickets = output.tickets;
-            const ticket_id = output.tickets.pop(); // delete ticket id from the list
-            Account.findByIdAndUpdate(id, { tickets: tickets })
-            .then((output) => {
-                // return the used ticket of the corresponding wallet_address
-                // subsequently call the contract from the frontend using ticket_id to register the used ticket in the blockchain
-                res.status(200).json({
-                    wallet_address: output.wallet_address,
-                    ticket_id: ticket_id
-                });
-            }).catch((err) => res.status(500).json({ message: err }));
+            if (tickets.length > 0) {
+                const ticket_id = output.tickets.pop(); // delete ticket id from the list
+                Account.findByIdAndUpdate(id, { tickets: tickets })
+                .then((output) => {
+                    // return the used ticket of the corresponding wallet_address
+                    // subsequently call the contract from the frontend using ticket_id to register the used ticket in the blockchain
+                    res.status(200).json({
+                        wallet_address: output.wallet_address,
+                        ticket_id: ticket_id
+                    });
+                }).catch((err) => res.status(500).json({ message: err }));
+            } else {
+                res.status(403).json({ message: "account has no remaining tickets." });
+            }
         } else {
             res.status(404).json({ message: "account not found." });
         }
