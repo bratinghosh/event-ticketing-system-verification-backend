@@ -7,7 +7,11 @@
 3. Copy the url from the website to the `.env` file.
 
 ## Setup
-1. Create `.env` file and the following:
+1. Download the npm packages:
+```
+npm install
+```
+3. Create `.env` file and the following:
 ```
 PORT=3030
 DATABASE_URL=<URL>
